@@ -53,7 +53,12 @@ def edit_category(category_id):
     """
     edited_category = session.query(Category).filter_by(id=category_id).one()
     if request.method == 'POST':
-        print('EDIT Category requires helper method to be written.')
+        if request.form['name']:
+            edited_category.name = request.form['name']
+        session.add(edited_category)
+        session.commit()
+        flash('Restaurant Successfully Edited %s' % edited_category.name)
+        return redirect(url_for('show_catalog'))
     else:
         return render_template('edit_category.html', category=edited_category)
 
@@ -104,7 +109,16 @@ def edit_item(item_id):
     """
     edited_item = session.query(Item).filter_by(id=item_id).one()
     if request.method == 'POST':
-        print('EDIT Item requires helper method to be written.')
+        if request.form['name']:
+            edited_item.name = request.form['name']
+        if request.form['description']:
+            edited_item.description = request.form['description']
+        if request.form['category_id']:
+            edit_item.category_id = request.form['category_id']
+        session.add(edited_item)
+        session.commit()
+        flash('Restaurant Successfully Edited %s' % edited_item.name)
+        return redirect(url_for('show_catalog'))
     else:
         return render_template('edit_item.html', item=edited_item)
 

@@ -5,7 +5,7 @@
         <h2>Categories:</h2>
         <ul>
             {% for category in categories %}
-            <li>{{category.name}}</li>
+            <li>{{category.name}}: {{category.id}}</li>
             {% endfor %}
         </ul>
     </div>
@@ -13,7 +13,7 @@
         <h2>Items:</h2>
         <ul>
             {% for item in items %}
-            <li>{{item.name}}</li>
+            <li>{{item.name}}: {{item.id}}</li>
             {% endfor %}
         </ul>
     </div>
