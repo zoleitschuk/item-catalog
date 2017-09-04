@@ -46,6 +46,7 @@ class Item(Base):
             'name': self.name,
             'description': self.description,
             'category_id': self.category_id,
+            'category': self.category,
         }
 
 engine = create_engine('sqlite:///itemCatalog.db')

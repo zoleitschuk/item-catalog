@@ -1,7 +1,7 @@
 """
 Module docstring here.
 """
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models import Base, Category, Item
@@ -13,6 +13,23 @@ Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
+# JSON APIs to view Catalog Information
+@app.route('/api/v01/catalog/JSON/')
+def catalog_JSON():
+    """
+    Method docstring here.
+    """
+    items = session.query(Item).all()
+    return jsonify(items=[i.serialize for i in items])
+
+@app.route('/api/v01/item/<int:item_id>/JSON/')
+def item_JSON(item_id):
+    """
+    Method docstring here.
+    """
+    item = session.query(Item).filter_by(id=item_id).one()
+    return jsonify(item=item.serialize)
 
 @app.route('/')
 @app.route('/catalog/')
