@@ -14,7 +14,7 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-# JSON APIs to view Catalog Information
+# JSON APIs to view Item Catalog Information
 @app.route('/api/v01/catalog/JSON/')
 def catalog_JSON():
     """
@@ -31,6 +31,7 @@ def item_JSON(item_id):
     item = session.query(Item).filter_by(id=item_id).one()
     return jsonify(item=item.serialize)
 
+# Item Catalog Pages
 @app.route('/')
 @app.route('/catalog/')
 def show_catalog():
@@ -57,7 +58,7 @@ def new_category():
     if request.method == 'POST':
         new_category = Category(name=request.form['name'])
         session.add(new_category)
-        flash('New Category %s Successfully Created' % new_category.name)
+        flash('New Category {} Successfully Created'.format(new_category.name))
         session.commit()
         return redirect(url_for('show_catalog'))
     else:
@@ -74,7 +75,7 @@ def edit_category(category_id):
             edited_category.name = request.form['name']
         session.add(edited_category)
         session.commit()
-        flash('Restaurant Successfully Edited %s' % edited_category.name)
+        flash('Restaurant Successfully Edited {}'.format(edited_category.name))
         return redirect(url_for('show_catalog'))
     else:
         return render_template('edit_category.html', category=edited_category)
@@ -87,7 +88,7 @@ def delete_category(category_id):
     category_to_delete = session.query(Category).filter_by(id=category_id).one()
     if request.method == 'POST':
         session.delete(category_to_delete)
-        flash('%s Successfully Deleted' % category_to_delete.name)
+        flash('{} Successfully Deleted'.format(category_to_delete.name))
         session.commit()
         return redirect(url_for('show_catalog'))
     else:
@@ -113,7 +114,7 @@ def new_item():
             category_id=request.form['category_id'],
         )
         session.add(new_item)
-        flash('New Item %s Successfully Created' % new_item.name)
+        flash('New Item {} Successfully Created'.format(new_item.name))
         session.commit()
         return redirect(url_for('show_catalog'))
     else:
@@ -134,7 +135,7 @@ def edit_item(item_id):
             edit_item.category_id = request.form['category_id']
         session.add(edited_item)
         session.commit()
-        flash('Restaurant Successfully Edited %s' % edited_item.name)
+        flash('Restaurant Successfully Edited {}'.format(edited_item.name))
         return redirect(url_for('show_catalog'))
     else:
         return render_template('edit_item.html', item=edited_item)
@@ -147,7 +148,7 @@ def delete_item(item_id):
     item_to_delete = session.query(Item).filter_by(id=item_id).one()
     if request.method == 'POST':
         session.delete(item_to_delete)
-        flash('%s Successfully Deleted' % item_to_delete.name)
+        flash('%s Successfully Deleted'.format(item_to_delete.name))
         session.commit()
         return redirect(url_for('show_catalog'))
     else:

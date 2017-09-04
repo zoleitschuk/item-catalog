@@ -2,7 +2,8 @@
 {% block content %}
 {% include "header.html" %}
     <div id="item">
-        <h2>Item {{ item.id }}</h2>
-        Item content goes here (maybe).
+        <h2>Item: {{ item.name }}</h2>
+        <div>Description: {{item.description}}</div>
+        <div>category_id: {{item.category_id}}</div>
     </div>
 {% endblock %}
