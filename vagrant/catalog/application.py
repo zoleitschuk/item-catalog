@@ -62,11 +62,14 @@ def delete_category(category_id):
     """
     Method docstring here.
     """
-    deleted_category = session.query(Category).filter_by(id=category_id).one()
+    category_to_delete = session.query(Category).filter_by(id=category_id).one()
     if request.method == 'POST':
-        print('DELETE Category requires helper method to be written.')
+        session.delete(category_to_delete)
+        flash('%s Successfully Deleted' % category_to_delete.name)
+        session.commit()
+        return redirect(url_for('show_catalog'))
     else:
-        return render_template('delete_category.html', category=deleted_category)
+        return render_template('delete_category.html', category=category_to_delete)
 
 @app.route('/item/<int:item_id>/')
 def show_item(item_id):
@@ -110,11 +113,14 @@ def delete_item(item_id):
     """
     Method docstring here.
     """
-    deleted_item = session.query(Item).filter_by(id=item_id).one()
+    item_to_delete = session.query(Item).filter_by(id=item_id).one()
     if request.method == 'POST':
-        print('DELETE Item requires helper method to be written.')
+        session.delete(item_to_delete)
+        flash('%s Successfully Deleted' % item_to_delete.name)
+        session.commit()
+        return redirect(url_for('show_catalog'))
     else:
-        return render_template('delete_item.html', item=deleted_item)
+        return render_template('delete_item.html', item=item_to_delete)
 
 if __name__ == '__main__':
     app.secret_key = 'shh_its_a_secret'
