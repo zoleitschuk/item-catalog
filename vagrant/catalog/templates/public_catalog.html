@@ -1,1 +1,19 @@
-<div>items</div>
+{% extends "layout.html" %}
+{% block content %}
+    <div id="catagories">
+        <h2>Categories:</h2>
+        <ul>
+            {% for category in categories %}
+            <li>{{category.name}}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div id="items">
+        <h2>Items:</h2>
+        <ul>
+            {% for item in items %}
+            <li>{{item.name}}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
