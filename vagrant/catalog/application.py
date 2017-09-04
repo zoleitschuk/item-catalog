@@ -1,7 +1,7 @@
 """
 Module docstring here.
 """
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, flash
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models import Base, Category, Item
@@ -38,7 +38,11 @@ def new_category():
     Method docstring here.
     """
     if request.method == 'POST':
-        print('CREATE Category requires helper method to be written.')
+        new_category = Category(name=request.form['name'])
+        session.add(new_category)
+        flash('New Category %s Successfully Created' % new_category.name)
+        session.commit()
+        return redirect(url_for('show_catalog'))
     else:
         return render_template('new_category.html')
 
@@ -105,5 +109,6 @@ def delete_item(item_id):
         return render_template('delete_item.html', item=deleted_item)
 
 if __name__ == '__main__':
+    app.secret_key = 'shh_its_a_secret'
     app.debug = True
     app.run(host='0.0.0.0', port=8000)
