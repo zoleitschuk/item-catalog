@@ -82,7 +82,15 @@ def new_item():
     Method docstring here.
     """
     if request.method == 'POST':
-        print('CREATE Item requires helper method to be written.')
+        new_item = Item(
+            name=request.form['name'],
+            description=request.form['description'],
+            category_id=request.form['category_id'],
+        )
+        session.add(new_item)
+        flash('New Item %s Successfully Created' % new_item.name)
+        session.commit()
+        return redirect(url_for('show_catalog'))
     else:
         return render_template('new_item.html')
 
