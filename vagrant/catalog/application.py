@@ -32,6 +32,16 @@ def catalog_category(category_id):
     # TODO: get full category object and pass into template.
     return render_template('category.html', category_id=category_id)
 
+@app.route('/category/new/', methods=['GET', 'POST'])
+def new_category():
+    """
+    Method docstring here.
+    """
+    if request.method == 'POST':
+        print('CREATE Category requires helper method to be written.')
+    else:
+        return render_template('new_category.html')
+
 @app.route('/category/<int:category_id>/edit/', methods=['GET', 'POST'])
 def edit_category(category_id):
     """
@@ -61,6 +71,16 @@ def catalog_item(item_id):
     """
     # TODO: get full item object and pass into template.
     return render_template('item.html', item_id=item_id)
+
+@app.route('/item/new/', methods=['GET', 'POST'])
+def new_item():
+    """
+    Method docstring here.
+    """
+    if request.method == 'POST':
+        print('CREATE Item requires helper method to be written.')
+    else:
+        return render_template('new_item.html')
 
 @app.route('/item/<int:item_id>/edit/', methods=['GET', 'POST'])
 def edit_item(item_id):
