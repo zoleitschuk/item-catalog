@@ -1,1 +1,84 @@
-<div>items</div>
+{% extends "main.html" %} {% block content %}
+<div class="row">
+    <div id="catagories" class="card col-md-3">
+        <div class="row card-header card-primary">
+            <h2>Categories</h2>
+            {% if 'username' in login_session %}
+            <a href="/category/new/" class="link-new">
+                <i class="fa fa-plus-square-o" aria-hidden="true"></i>
+            </a>
+            {% endif %}
+        </div>
+        <div class="row">
+            <table class="table table-hover">
+                <thead class="thead-default">
+                    <tr>
+                        <th>Name</th>
+                        {% if 'username' in login_session %}
+                        <th>Edit/Delete</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category in categories %}
+                    <!-- TODO: only make selected category active class="table-info" -->
+                    <tr>
+                        <td>
+                            <a href="/category/{{category.id}}/">{{category.name}}</a>
+                        </td>
+                        {% if 'username' in login_session %}
+                        <td>
+                            <a href="/category/{{category.id}}/edit/">Edit</a> /
+                            <a href="/category/{{category.id}}/delete/">Delete</a>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div id="items" class="card col-md-8">
+        <div class="row card-header card-primary">
+            <h2>Items</h2>
+            {% if 'username' in login_session %}
+            <a href="/item/new/" class="link-new">
+                <i class="fa fa-plus-square-o" aria-hidden="true"></i>
+            </a>
+            {% endif %}
+        </div>
+        <div class="row">
+            <table class="table table-hover">
+                <thead class="thead-default">
+                    <tr>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        {% if 'username' in login_session %}
+                        <th>Edit/Delete</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>
+                            <a href="/item/{{item.id}}/">{{item.name}}</a>
+                        </td>
+                        <td>{{item.category_name}}</td>
+                        <td>{{item.description}}</td>
+                        {% if 'username' in login_session %}
+                        <td>
+                            <a href="/item/{{item.id}}/edit/">Edit</a> /
+                            <a href="/item/{{item.id}}/delete/">Delete</a>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

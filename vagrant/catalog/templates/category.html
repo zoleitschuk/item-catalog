@@ -1,8 +1,11 @@
 {% extends "main.html" %}
 {% block content %}
-{% include "header.html" %}
-    <div id="category">
-        <h2>Category: {{ category.name }}</h2>
-        Category content goes here (maybe).
-    </div>
+<div class="card col-md-8">
+        <div class="row card-header card-primary">
+            <h2>Category: {{ category.name }}</h2>
+        </div>
+        <div class="row">
+    <div class="col-md-12"><h3>Category</h3><p>{{category.name}}</p></div>
+</div>
+</div>
 {% endblock %}

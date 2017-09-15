@@ -1,9 +1,12 @@
 {% extends "main.html" %}
 {% block content %}
-{% include "header.html" %}
-    <div id="item">
-        <h2>Item: {{ item.name }}</h2>
-        <div>Description: {{item.description}}</div>
-        <div>category_id: {{item.category_id}}</div>
+    <div class="card col-md-8">
+            <div class="row card-header card-primary">
+                <h2>Item: {{ item.name }}</h2>
+            </div>
+            <div class="row">
+        <div class="col-md-12"><h3>Category</h3><p>{{item.category_name}}</p></div>
+        <div class="col-md-12"><h3>Description</h3><p>{{item.description}}</p></div>
     </div>
+</div>
 {% endblock %}

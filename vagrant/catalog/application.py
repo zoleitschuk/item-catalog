@@ -1,19 +1,20 @@
 """
 Module docstring here.
 """
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, make_response
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from models import Base, Category, Item
-
-from flask import session as login_session
-import random, string
-import httplib2
+import random
+import string
 import json
+import httplib2
 import requests
 
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, make_response
+from flask import session as login_session
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
+
+from models import Base, Category, Item
 
 app = Flask(__name__)
 
@@ -114,12 +115,6 @@ def gconnect():
     # ADD PROVIDER TO LOGIN SESSION
     login_session['provider'] = 'google'
 
-    # # see if user exists, if it doesn't make a new one
-    # user_id = getUserID(data["email"])
-    # if not user_id:
-    #     user_id = createUser(login_session)
-    # login_session['user_id'] = user_id
-
     output = ''
     output += '<h1>Welcome, '
     output += login_session['username']
@@ -154,11 +149,13 @@ def gdisconnect():
         del login_session['picture']
         response = make_response(json.dumps('Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
-        return response
+        flash('Successfully disconnected.')
+        return redirect(url_for('show_catalog'))
     else:
         response = make_response(json.dumps('Failed to revoke token for given user.', 400))
         response.headers['Content-Type'] = 'application/json'
-        return response
+        flash('Failed to revoke token for given user.')
+        return redirect(url_for('show_catalog'))
 
 # JSON APIs to view Item Catalog Information
 @app.route('/api/v01/catalog/JSON/')
@@ -185,8 +182,9 @@ def show_catalog():
     Method docstring here.
     """
     categories = session.query(Category).all()
-    items = session.query(Item).all()
-    return render_template('public_catalog.html', items=items, categories=categories)
+    items = [i.serialize for i in session.query(Item).all()]
+    
+    return render_template('catalog.html', items=items, categories=categories, login_session=login_session)
 
 @app.route('/category/<int:category_id>/')
 def show_category(category_id):
@@ -194,7 +192,7 @@ def show_category(category_id):
     Method docstring here.
     """
     category = session.query(Category).filter_by(id=category_id).one()
-    return render_template('category.html', category=category)
+    return render_template('category.html', category=category, login_session=login_session)
 
 @app.route('/category/new/', methods=['GET', 'POST'])
 def new_category():
@@ -208,7 +206,7 @@ def new_category():
         session.commit()
         return redirect(url_for('show_catalog'))
     else:
-        return render_template('new_category.html')
+        return render_template('category_new.html', login_session=login_session)
 
 @app.route('/category/<int:category_id>/edit/', methods=['GET', 'POST'])
 def edit_category(category_id):
@@ -224,7 +222,7 @@ def edit_category(category_id):
         flash('Restaurant Successfully Edited {}'.format(edited_category.name))
         return redirect(url_for('show_catalog'))
     else:
-        return render_template('edit_category.html', category=edited_category)
+        return render_template('category_edit.html', category=edited_category, login_session=login_session)
 
 @app.route('/category/<int:category_id>/delete/', methods=['GET', 'POST'])
 def delete_category(category_id):
@@ -238,7 +236,7 @@ def delete_category(category_id):
         session.commit()
         return redirect(url_for('show_catalog'))
     else:
-        return render_template('delete_category.html', category=category_to_delete)
+        return render_template('category_delete.html', category=category_to_delete, login_session=login_session)
 
 @app.route('/item/<int:item_id>/')
 def show_item(item_id):
@@ -246,7 +244,7 @@ def show_item(item_id):
     Method docstring here.
     """
     item = session.query(Item).filter_by(id=item_id).one()
-    return render_template('item.html', item=item)
+    return render_template('item.html', item=item.serialize, login_session=login_session)
 
 @app.route('/item/new/', methods=['GET', 'POST'])
 def new_item():
@@ -264,7 +262,8 @@ def new_item():
         session.commit()
         return redirect(url_for('show_catalog'))
     else:
-        return render_template('new_item.html')
+        categories = session.query(Category).all()
+        return render_template('item_new.html', categories=categories, login_session=login_session)
 
 @app.route('/item/<int:item_id>/edit/', methods=['GET', 'POST'])
 def edit_item(item_id):
@@ -278,13 +277,14 @@ def edit_item(item_id):
         if request.form['description']:
             edited_item.description = request.form['description']
         if request.form['category_id']:
-            edit_item.category_id = request.form['category_id']
+            edited_item.category_id = request.form['category_id']
         session.add(edited_item)
         session.commit()
         flash('Restaurant Successfully Edited {}'.format(edited_item.name))
         return redirect(url_for('show_catalog'))
     else:
-        return render_template('edit_item.html', item=edited_item)
+        categories = session.query(Category).all()
+        return render_template('item_edit.html', item=edited_item, categories=categories, login_session=login_session)
 
 @app.route('/item/<int:item_id>/delete/', methods=['GET', 'POST'])
 def delete_item(item_id):
@@ -294,11 +294,11 @@ def delete_item(item_id):
     item_to_delete = session.query(Item).filter_by(id=item_id).one()
     if request.method == 'POST':
         session.delete(item_to_delete)
-        flash('%s Successfully Deleted'.format(item_to_delete.name))
+        flash('{} Successfully Deleted'.format(item_to_delete.name))
         session.commit()
         return redirect(url_for('show_catalog'))
     else:
-        return render_template('delete_item.html', item=item_to_delete)
+        return render_template('item_delete.html', item=item_to_delete, login_session=login_session)
 
 if __name__ == '__main__':
     app.secret_key = 'shh_its_a_secret'
