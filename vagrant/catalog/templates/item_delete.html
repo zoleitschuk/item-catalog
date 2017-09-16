@@ -2,12 +2,12 @@
 {% block content %}
 <div class="card col-md-8">
         <div class="row card-header card-primary">
-            <h2>Are you sure you want to delete: {{item.name}}?</h2>
+            <h2>Delete Item?</h2>
         </div>
         <div class="row">
 <form action="#" method = 'post'>
-
-	<button type="submit" class="btn btn-default delete" id="submit" type="submit">
+	<p>Are you sure you want to delete <strong>{{item.name}}</strong>?</p>
+	<button type="submit" class="btn btn-default delete" id="submit" name="btn_submit">
 	<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>Delete</button>
 	<a href = '{{url_for('show_catalog')}}'>
 		<button class="btn btn-default delete">

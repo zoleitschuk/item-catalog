@@ -42,9 +42,12 @@
         <div class="row card-header card-primary">
             <h2>Items</h2>
             {% if 'username' in login_session %}
-            <a href="/item/new/" class="link-new">
-                <i class="fa fa-plus-square-o" aria-hidden="true"></i>
-            </a>
+                <!-- disable add item button if no categories exist -->
+                {% if categories[0] %}
+                <a href="/item/new/" class="link-new">
+                    <i class="fa fa-plus-square-o" aria-hidden="true"></i>
+                </a>
+                {% endif %}
             {% endif %}
         </div>
         <div class="row">

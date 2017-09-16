@@ -183,7 +183,7 @@ def show_catalog():
     """
     categories = session.query(Category).all()
     items = [i.serialize for i in session.query(Item).all()]
-    
+
     return render_template('catalog.html', items=items, categories=categories, login_session=login_session)
 
 @app.route('/category/<int:category_id>/')
@@ -215,11 +215,14 @@ def edit_category(category_id):
     """
     edited_category = session.query(Category).filter_by(id=category_id).one()
     if request.method == 'POST':
-        if request.form['name']:
-            edited_category.name = request.form['name']
-        session.add(edited_category)
-        session.commit()
-        flash('Restaurant Successfully Edited {}'.format(edited_category.name))
+        if 'btn_submit' in request.form:
+            if request.form['name']:
+                edited_category.name = request.form['name']
+                session.add(edited_category)
+                session.commit()
+                flash('Category Successfully Edited {}'.format(edited_category.name))
+        else:
+            flash('Category Edit {} Was Cancelled'.format(edited_category.name))
         return redirect(url_for('show_catalog'))
     else:
         return render_template('category_edit.html', category=edited_category, login_session=login_session)
@@ -231,9 +234,15 @@ def delete_category(category_id):
     """
     category_to_delete = session.query(Category).filter_by(id=category_id).one()
     if request.method == 'POST':
-        session.delete(category_to_delete)
-        flash('{} Successfully Deleted'.format(category_to_delete.name))
-        session.commit()
+        if 'btn_submit' in request.form:
+            items_to_delete =session.query(Item).filter_by(category_id=category_to_delete.id)
+            for item in items_to_delete:
+                session.delete(item)
+            session.delete(category_to_delete)
+            flash('{} Successfully Deleted'.format(category_to_delete.name))
+            session.commit()
+        else:
+            flash('Delete {} Cancelled'.format(category_to_delete.name))
         return redirect(url_for('show_catalog'))
     else:
         return render_template('category_delete.html', category=category_to_delete, login_session=login_session)
@@ -272,15 +281,18 @@ def edit_item(item_id):
     """
     edited_item = session.query(Item).filter_by(id=item_id).one()
     if request.method == 'POST':
-        if request.form['name']:
-            edited_item.name = request.form['name']
-        if request.form['description']:
-            edited_item.description = request.form['description']
-        if request.form['category_id']:
-            edited_item.category_id = request.form['category_id']
-        session.add(edited_item)
-        session.commit()
-        flash('Restaurant Successfully Edited {}'.format(edited_item.name))
+        if 'btn_submit' in request.form:
+            if request.form['name']:
+                edited_item.name = request.form['name']
+            if request.form['description']:
+                edited_item.description = request.form['description']
+            if request.form['category_id']:
+                edited_item.category_id = request.form['category_id']
+            session.add(edited_item)
+            session.commit()
+            flash('Item Successfully Edited {}'.format(edited_item.name))
+        else:
+            flash('Edit Item {} Was Cancelled'.format(edited_item.name))
         return redirect(url_for('show_catalog'))
     else:
         categories = session.query(Category).all()
@@ -293,9 +305,12 @@ def delete_item(item_id):
     """
     item_to_delete = session.query(Item).filter_by(id=item_id).one()
     if request.method == 'POST':
-        session.delete(item_to_delete)
-        flash('{} Successfully Deleted'.format(item_to_delete.name))
-        session.commit()
+        if 'btn_submit' in request.form:
+            session.delete(item_to_delete)
+            flash('{} Successfully Deleted'.format(item_to_delete.name))
+            session.commit()
+        else:
+            flash('Delete Item {} Cancelled'.format(item_to_delete.name))
         return redirect(url_for('show_catalog'))
     else:
         return render_template('item_delete.html', item=item_to_delete, login_session=login_session)
