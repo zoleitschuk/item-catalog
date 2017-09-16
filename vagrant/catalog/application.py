@@ -199,6 +199,10 @@ def new_category():
     """
     Method docstring here.
     """
+    if 'username' not in login_session:
+        flash('Please login in order to add categories')
+        return redirect(url_for('show_catalog'))
+    
     if request.method == 'POST':
         new_category = Category(name=request.form['name'])
         session.add(new_category)
@@ -213,6 +217,10 @@ def edit_category(category_id):
     """
     Method docstring here.
     """
+    if 'username' not in login_session:
+        flash('Please login in order to edit categories')
+        return redirect(url_for('show_catalog'))
+    
     edited_category = session.query(Category).filter_by(id=category_id).one()
     if request.method == 'POST':
         if 'btn_submit' in request.form:
@@ -232,6 +240,10 @@ def delete_category(category_id):
     """
     Method docstring here.
     """
+    if 'username' not in login_session:
+        flash('Please login in order to delete categories')
+        return redirect(url_for('show_catalog'))
+    
     category_to_delete = session.query(Category).filter_by(id=category_id).one()
     if request.method == 'POST':
         if 'btn_submit' in request.form:
@@ -260,6 +272,10 @@ def new_item():
     """
     Method docstring here.
     """
+    if 'username' not in login_session:
+        flash('Please login in order to add items')
+        return redirect(url_for('show_catalog'))
+
     if request.method == 'POST':
         new_item = Item(
             name=request.form['name'],
@@ -279,6 +295,10 @@ def edit_item(item_id):
     """
     Method docstring here.
     """
+    if 'username' not in login_session:
+        flash('Please login in order to edit items')
+        return redirect(url_for('show_catalog'))
+
     edited_item = session.query(Item).filter_by(id=item_id).one()
     if request.method == 'POST':
         if 'btn_submit' in request.form:
@@ -303,6 +323,10 @@ def delete_item(item_id):
     """
     Method docstring here.
     """
+    if 'username' not in login_session:
+        flash('Please login in order to delete items')
+        return redirect(url_for('show_catalog'))
+
     item_to_delete = session.query(Item).filter_by(id=item_id).one()
     if request.method == 'POST':
         if 'btn_submit' in request.form:
