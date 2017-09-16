@@ -1,6 +1,6 @@
 """Define ORM for the itemCatelog database.
 
-classes:
+Classes:
     Category: A Category represents a general grouping (category) that various items can belong to.
     Item: An Item represents a specific thing, that belongs to a larger group (Category) of things.
 """

@@ -1,5 +1,20 @@
-"""
-Module docstring here.
+"""Module defining routes and associated methods for the item-catelog Flask applicaiton.
+
+Methods:
+    show_login: Serves client with page to allows them to sign in using Google OAuth.
+    gconnect: Connects client using Google OAuth.
+    gdisconnect: Disconnects the client from the server.
+    catalog_JSON: Returns all item data in the catelog in JSON format.
+    item_JSON: Returns a specific item's information in JSON.
+    show_catalog: Provides the client with the ability to view all categories and items.
+    show_category: Provides the client with the ability to view a category.
+    new_category: Provides the client with the ability to create a new category.
+    edit_category: Provides the client with the ability to edit a category.
+    delete_category: Provides the client with the ability to delete a category.
+    show_item: Provides the client with the ability to view an item.
+    new_item: Provides the client with the ability to create a new item.
+    edit_item: Provides the client with the ability to edit an item.
+    delete_item: Provides the client with the ability to delete an item.
 """
 import random
 import string
@@ -28,9 +43,13 @@ CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_i
 
 # Create anti-forgery state token
 @app.route('/login')
-def showLogin():
-    """
-    Method docstring here.
+def show_login():
+    """Serves client with page to allows them to sign in using Google OAuth.
+
+    Args:
+        None
+    Returns:
+        login.html
     """
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in range(32))
@@ -40,8 +59,12 @@ def showLogin():
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
-    """
-    Method docstring here.
+    """Connects client using Google OAuth.
+
+    Args:
+        None.
+    Returns:
+        None.
     """
     # Validate state token
     if request.args.get('state') != login_session['state']:
@@ -115,21 +138,17 @@ def gconnect():
     # ADD PROVIDER TO LOGIN SESSION
     login_session['provider'] = 'google'
 
-    output = ''
-    output += '<h1>Welcome, '
-    output += login_session['username']
-    output += '!</h1>'
-    output += '<img src="'
-    output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
-    flash("you are now logged in as %s" % login_session['username'])
-    print('done!')
-    return output
+    flash('Now logged in as {}'.format(login_session['username']))
+    return render_template('catalog.html')
 
 @app.route('/gdisconnect')
 def gdisconnect():
-    """
-    Method docstring here.
+    """Disconnects the client from the server.
+
+    Args:
+        None
+    Returns:
+        Redirect to catelog.htlm through show_catelog()
     """
     # Only disconnect a connected user.
     access_token = login_session.get('access_token')
@@ -160,16 +179,24 @@ def gdisconnect():
 # JSON APIs to view Item Catalog Information
 @app.route('/api/v01/catalog/JSON/')
 def catalog_JSON():
-    """
-    Method docstring here.
+    """Returns all item data in the catelog in JSON format.
+
+    Args:
+        None.
+    Returns:
+        JSON object representing all Item data in the database.
     """
     items = session.query(Item).all()
     return jsonify(items=[i.serialize for i in items])
 
 @app.route('/api/v01/item/<int:item_id>/JSON/')
 def item_JSON(item_id):
-    """
-    Method docstring here.
+    """Returns a specific item's information in JSON.
+
+    Args:
+        item_id: An integer representing the database id of the item who's data is to be returned
+    Returns:
+        JSON object representing a specific Item where Item.id==item_id.
     """
     item = session.query(Item).filter_by(id=item_id).one()
     return jsonify(item=item.serialize)
@@ -178,31 +205,52 @@ def item_JSON(item_id):
 @app.route('/')
 @app.route('/catalog/')
 def show_catalog():
-    """
-    Method docstring here.
+    """Provides the client with the ability to view all categories and items.
+
+    Args:
+        None.
+    Returns:
+        catelog.html
     """
     categories = session.query(Category).all()
     items = [i.serialize for i in session.query(Item).all()]
 
-    return render_template('catalog.html', items=items, categories=categories, login_session=login_session)
+    return render_template(
+        'catalog.html',
+        items=items,
+        categories=categories,
+        login_session=login_session
+    )
 
 @app.route('/category/<int:category_id>/')
 def show_category(category_id):
-    """
-    Method docstring here.
+    """Provides the client with the ability to view a category.
+
+    Args:
+        category_id: An integer representing the database id of the category to be viewed.
+    Returns:
+        category.html for the category that has category_id
     """
     category = session.query(Category).filter_by(id=category_id).one()
     return render_template('category.html', category=category, login_session=login_session)
 
 @app.route('/category/new/', methods=['GET', 'POST'])
 def new_category():
-    """
-    Method docstring here.
+    """Provides the client with the ability to create a new category.
+
+    Verifies that the user is logged in. On GET requests, a form will be served for user to create
+    a new category. On POST requests, the category will be created. If the user is not logged in,
+    the client will be redirected to the main page.
+
+    Args:
+        None.
+    Returns:
+        Either category_new.html or redirects to catelog.htlm via show_catelog().
     """
     if 'username' not in login_session:
         flash('Please login in order to add categories')
         return redirect(url_for('show_catalog'))
-    
+
     if request.method == 'POST':
         new_category = Category(name=request.form['name'])
         session.add(new_category)
@@ -214,13 +262,21 @@ def new_category():
 
 @app.route('/category/<int:category_id>/edit/', methods=['GET', 'POST'])
 def edit_category(category_id):
-    """
-    Method docstring here.
+    """Provides the client with the ability to edit a category.
+
+    Verifies that the user is logged in. On GET requests, a form will be served for user to edit
+    the category. On POST requests, the category will be edited. If the user is not logged in, the
+    client will be redirected to the main page.
+
+    Args:
+        category_id: An integer representing the database id of the category to be edited.
+    Returns:
+        Either category_edit.html or redirects to catelog.htlm via show_catelog().
     """
     if 'username' not in login_session:
         flash('Please login in order to edit categories')
         return redirect(url_for('show_catalog'))
-    
+
     edited_category = session.query(Category).filter_by(id=category_id).one()
     if request.method == 'POST':
         if 'btn_submit' in request.form:
@@ -233,21 +289,33 @@ def edit_category(category_id):
             flash('Category Edit {} Was Cancelled'.format(edited_category.name))
         return redirect(url_for('show_catalog'))
     else:
-        return render_template('category_edit.html', category=edited_category, login_session=login_session)
+        return render_template(
+            'category_edit.html',
+            category=edited_category,
+            login_session=login_session
+        )
 
 @app.route('/category/<int:category_id>/delete/', methods=['GET', 'POST'])
 def delete_category(category_id):
-    """
-    Method docstring here.
+    """Provides the client with the ability to delete a category.
+
+    Verifies that the user is logged in. On GET requests, a form will be served for user to delete
+    the category. On POST requests, the category will be deleted. If the user is not logged in, the
+    client will be redirected to the main page.
+
+    Args:
+        category_id: An integer representing the database id of the category to be deleted.
+    Returns:
+        Either category_delete.html or redirects to catelog.htlm via show_catelog().
     """
     if 'username' not in login_session:
         flash('Please login in order to delete categories')
         return redirect(url_for('show_catalog'))
-    
+
     category_to_delete = session.query(Category).filter_by(id=category_id).one()
     if request.method == 'POST':
         if 'btn_submit' in request.form:
-            items_to_delete =session.query(Item).filter_by(category_id=category_to_delete.id)
+            items_to_delete = session.query(Item).filter_by(category_id=category_to_delete.id)
             for item in items_to_delete:
                 session.delete(item)
             session.delete(category_to_delete)
@@ -257,20 +325,36 @@ def delete_category(category_id):
             flash('Delete {} Cancelled'.format(category_to_delete.name))
         return redirect(url_for('show_catalog'))
     else:
-        return render_template('category_delete.html', category=category_to_delete, login_session=login_session)
+        return render_template(
+            'category_delete.html',
+            category=category_to_delete,
+            login_session=login_session
+        )
 
 @app.route('/item/<int:item_id>/')
 def show_item(item_id):
-    """
-    Method docstring here.
+    """Provides the client with the ability to view an item.
+
+    Args:
+        item_id: An integer representing the database id of the item to be viewed.
+    Returns:
+        Either item.html for the provided item_id.
     """
     item = session.query(Item).filter_by(id=item_id).one()
     return render_template('item.html', item=item.serialize, login_session=login_session)
 
 @app.route('/item/new/', methods=['GET', 'POST'])
 def new_item():
-    """
-    Method docstring here.
+    """Provides the client with the ability to create a new item.
+
+    Verifies that the user is logged in. On GET requests, a form will be served for user to enter
+    new item information. On POST requests, a new item will be created. If the user is notlogged in,
+    the client will be redirected to the main page.
+
+    Args:
+        None.
+    Returns:
+        Either item_new.html or redirects to catelog.htlm via show_catelog().
     """
     if 'username' not in login_session:
         flash('Please login in order to add items')
@@ -292,8 +376,16 @@ def new_item():
 
 @app.route('/item/<int:item_id>/edit/', methods=['GET', 'POST'])
 def edit_item(item_id):
-    """
-    Method docstring here.
+    """Provides the client with the ability to edit an item.
+
+    Verifies that the user is logged in. On GET requests, a form will be served for user to edit
+    item information. On POST requests, the item will be edited. If the user is not logged in, the
+    client will be redirected to the main page.
+
+    Args:
+        item_id: An integer representing the database id of the item to be edited.
+    Returns:
+        Either item_edit.html or redirects to catelog.htlm via show_catelog().
     """
     if 'username' not in login_session:
         flash('Please login in order to edit items')
@@ -316,12 +408,26 @@ def edit_item(item_id):
         return redirect(url_for('show_catalog'))
     else:
         categories = session.query(Category).all()
-        return render_template('item_edit.html', item=edited_item, categories=categories, login_session=login_session)
+        return render_template(
+            'item_edit.html',
+            item=edited_item,
+            categories=categories,
+            login_session=login_session
+        )
 
 @app.route('/item/<int:item_id>/delete/', methods=['GET', 'POST'])
 def delete_item(item_id):
-    """
-    Method docstring here.
+    """Provides the client with the ability to delete an item.
+
+    Prior to any operation verifies that user has logged in. If the user is logged in method will:
+    On GET requests, confirms with user that they want to delete the item identified by item_id.
+    On POST requests, verifies that user has confirmed they want to delete the item, and if
+    confirmed, will delete the item with item_id.
+
+    Args:
+        item_id: An integer representing the database id of the item to be deleted.
+    Returns:
+        Either item_delete.html or redirects to catelog.htlm via show_catelog().
     """
     if 'username' not in login_session:
         flash('Please login in order to delete items')
