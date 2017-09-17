@@ -8,7 +8,8 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
+* [Vagrant] (https://www.vagrantup.com/)
+* [VirtualBox] (https://www.virtualbox.org/)
 
 ```
 Give examples
@@ -16,21 +17,53 @@ Give examples
 
 ### Installing
 
-A step by step series of examples that tell you have to get a development env running
+Below is a step by step series of instructions that guide you through getting a development env running.
 
-Say what the step will be
+1. Install [Vagrant] (https://www.vagrantup.com/) and [VirtualBox] (https://www.virtualbox.org/). For instruction on how to install either follow the links.
 
-```
-Give the example
-```
+2. Clone the [item-catelog] (https://github.com/zoleitschuk/item-catalog/tree/master) repository. A [Vagrantfile] (vagrant/Vagrantfile) is included to configure your Vagrant VM.
 
-And repeat
+3. Launch the Vagrant VM by typing `vagrant up` in the directory `item-catelog/vagrant` from the terminal.
 
 ```
-until finished
+Zacharys-MacBook-Pro:catalog Zach$ vagrant up
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
+4. Log in to the Vagrant VM by typing `vagrant ssh` in the terminal.
+
+```
+Zacharys-MacBook-Pro:catalog Zach$ vagrant ssh
+```
+
+5. Navigate to the directory `/vagrant/catalog` in the Vagrant VM by typing `cd /vagrant/catalog` in the terminal.
+
+```
+vagrant@vagrant:~$ cd /vagrant/catalog
+```
+
+6. Start the application by typing `python3 application.py` in the directory `/vagrant/catalog` of the Vagrant VM in the terminal.
+
+```
+vagrant@vagrant:/vagrant/catalog$ python3 application.py
+```
+
+7. In your browser go to [http://localhost:8000] (http://localhost:8000) to view the application. In order to log in to the application you will need a google account.
+
+To exit the application, simply type `CTRL+C`  in the terminal running `application.py`. You can then log out and shut down the Vagrant VM by typing `exit` into the terminal, then typing `vagrant halt`.
+
+```
+vagrant@vagrant:/vagrant/catalog$ python3 application.py
+ * Running on http://0.0.0.0:8000/ (Press CTRL+C to quit)
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 925-200-313
+^Cvagrant@vagrant:/vagrant/catalog$ exit
+logout
+Connection to 127.0.0.1 closed.
+Zacharys-MacBook-Pro:catalog Zach$ vagrant halt
+==> default: Attempting graceful shutdown of VM...
+Zacharys-MacBook-Pro:catalog Zach$ 
+```
 
 ## Built With
 
@@ -41,8 +74,8 @@ End with an example of getting some data out of the system or using it for a lit
 
 ## Authors
 
-* **Zachary Oleitschuk** - *Initial work* - [zoleitschuk](https://github.com/zoleitschuk/)
+* **Zachary Oleitschuk** - [zoleitschuk](https://github.com/zoleitschuk/)
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
