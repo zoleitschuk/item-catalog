@@ -4,24 +4,21 @@ Item Catelog provides a list of items within a variety of categories as well as 
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+These instructions will get you a copy of the project up and running on your local machine.
 
 ### Prerequisites
 
-* [Vagrant] (https://www.vagrantup.com/)
-* [VirtualBox] (https://www.virtualbox.org/)
-
-```
-Give examples
-```
+* [Vagrant](https://www.vagrantup.com/)
+* [VirtualBox](https://www.virtualbox.org/)
+* A [Google Account](https://accounts.google.com/SignUp) in order to log in to the application once it is running.
 
 ### Installing
 
 Below is a step by step series of instructions that guide you through getting a development env running.
 
-1. Install [Vagrant] (https://www.vagrantup.com/) and [VirtualBox] (https://www.virtualbox.org/). For instruction on how to install either follow the links.
+1. Install [Vagrant](https://www.vagrantup.com/) and [VirtualBox](https://www.virtualbox.org/). For instruction on how to install either follow the links.
 
-2. Clone the [item-catelog] (https://github.com/zoleitschuk/item-catalog/tree/master) repository. A [Vagrantfile] (vagrant/Vagrantfile) is included to configure your Vagrant VM.
+2. Clone the [item-catelog](https://github.com/zoleitschuk/item-catalog/tree/master) repository. A [Vagrantfile](vagrant/Vagrantfile) is included to configure your Vagrant VM.
 
 3. Launch the Vagrant VM by typing `vagrant up` in the directory `item-catelog/vagrant` from the terminal.
 
@@ -47,7 +44,7 @@ vagrant@vagrant:~$ cd /vagrant/catalog
 vagrant@vagrant:/vagrant/catalog$ python3 application.py
 ```
 
-7. In your browser go to [http://localhost:8000] (http://localhost:8000) to view the application. In order to log in to the application you will need a google account.
+7. In your browser go to [http://localhost:8000](http://localhost:8000) to view the application. In order to log in to the application you will need a google account.
 
 To exit the application, simply type `CTRL+C`  in the terminal running `application.py`. You can then log out and shut down the Vagrant VM by typing `exit` into the terminal, then typing `vagrant halt`.
 
@@ -67,10 +64,10 @@ Zacharys-MacBook-Pro:catalog Zach$
 
 ## Built With
 
-* [Flask] (http://flask.pocoo.org/) - Framework for Python
-* [SQLAlchemy] (https://www.sqlalchemy.org/) - Python SQL toolkit and Object Relational Mapper
-* [Google OAuth] (https://developers.google.com/identity/protocols/OAuth2) - Authentication
-* [Python 3.x] (https://www.python.org/) - Language
+* [Flask](http://flask.pocoo.org/) - Framework for Python
+* [SQLAlchemy](https://www.sqlalchemy.org/) - Python SQL toolkit and Object Relational Mapper
+* [Google OAuth](https://developers.google.com/identity/protocols/OAuth2) - Authentication
+* [Python 3.x](https://www.python.org/) - Language
 
 ## Authors
 
