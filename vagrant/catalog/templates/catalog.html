@@ -3,7 +3,7 @@
     <div id="catagories" class="card col-md-3">
         <div class="row card-header card-primary">
             <h2>Categories</h2>
-            {% if 'username' in login_session %}
+            {% if 'user_id' in login_session %}
             <a href="/category/new/" class="link-new">
                 <i class="fa fa-plus-square-o" aria-hidden="true"></i>
             </a>
@@ -14,7 +14,7 @@
                 <thead class="thead-default">
                     <tr>
                         <th>Name</th>
-                        {% if 'username' in login_session %}
+                        {% if 'user_id' in login_session %}
                         <th>Edit/Delete</th>
                         {% endif %}
                     </tr>
@@ -26,10 +26,14 @@
                         <td>
                             <a href="/category/{{category.id}}/">{{category.name}}</a>
                         </td>
-                        {% if 'username' in login_session %}
+                        {% if 'user_id' in login_session %}
                         <td>
-                            <a href="/category/{{category.id}}/edit/">Edit</a> /
-                            <a href="/category/{{category.id}}/delete/">Delete</a>
+                            {% if login_session.user_id == category.user_id %}
+                                <a href="/category/{{category.id}}/edit/">Edit</a> /
+                                <a href="/category/{{category.id}}/delete/">Delete</a>
+                                {% else %}
+                                    <p class="unauthorized"><em>Unauthorized</em></p>
+                            {% endif %}
                         </td>
                         {% endif %}
                     </tr>
@@ -41,7 +45,7 @@
     <div id="items" class="card col-md-8">
         <div class="row card-header card-primary">
             <h2>Items</h2>
-            {% if 'username' in login_session %}
+            {% if 'user_id' in login_session %}
                 <!-- disable add item button if no categories exist -->
                 {% if categories[0] %}
                 <a href="/item/new/" class="link-new">
@@ -57,7 +61,7 @@
                         <th>Name</th>
                         <th>Category</th>
                         <th>Description</th>
-                        {% if 'username' in login_session %}
+                        {% if 'user_id' in login_session %}
                         <th>Edit/Delete</th>
                         {% endif %}
                     </tr>
@@ -70,10 +74,14 @@
                         </td>
                         <td>{{item.category_name}}</td>
                         <td>{{item.description}}</td>
-                        {% if 'username' in login_session %}
+                        {% if 'user_id' in login_session %}
                         <td>
-                            <a href="/item/{{item.id}}/edit/">Edit</a> /
-                            <a href="/item/{{item.id}}/delete/">Delete</a>
+                            {% if login_session.user_id == item.user_id %}                                
+                                <a href="/item/{{item.id}}/edit/">Edit</a> /
+                                <a href="/item/{{item.id}}/delete/">Delete</a>
+                            {% else %}
+                                <p class="unauthorized"><em>Unauthorized</em></p>
+                            {% endif %}
                         </td>
                         {% endif %}
                     </tr>

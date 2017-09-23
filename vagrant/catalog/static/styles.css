@@ -9,3 +9,7 @@
 .link-new {
     color: black;
 }
+
+.unauthorized {
+    color: gray;
+}

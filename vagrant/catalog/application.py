@@ -29,7 +29,7 @@ from sqlalchemy.orm import sessionmaker
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 
-from models import Base, Category, Item
+from models import Base, User, Category, Item
 
 app = Flask(__name__)
 
@@ -135,10 +135,20 @@ def gconnect():
     login_session['username'] = data['name']
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
+
+    # Check for user registration if not registered create a new user.
+    user_id = get_user_id(login_session['email'])
+    if user_id:
+        login_session['user_id'] = user_id
+        flash('Welcome back {}!'.format(login_session['username']))
+    else:
+        new_user = create_user(login_session['username'], login_session['email'])
+        login_session['user_id'] = new_user.id
+        flash('Welcome {}. We are excited that you have joined us!'.format(login_session['username']))
+
     # ADD PROVIDER TO LOGIN SESSION
     login_session['provider'] = 'google'
 
-    flash('Now logged in as {}'.format(login_session['username']))
     return render_template('catalog.html')
 
 @app.route('/gdisconnect')
@@ -166,6 +176,7 @@ def gdisconnect():
         del login_session['username']
         del login_session['email']
         del login_session['picture']
+        del login_session['user_id']
         response = make_response(json.dumps('Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         flash('Successfully disconnected.')
@@ -175,6 +186,36 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         flash('Failed to revoke token for given user.')
         return redirect(url_for('show_catalog'))
+
+# User helper functions
+def create_user(name, email):
+    """Creates a new user in the database and returns the new User object.
+
+    Args:
+        name: The name of the new user.
+        email: The email of the new user. This is assumed to be unique in the database.
+    Returns:
+        User object for the newly registered user.
+    """
+    new_user = User(name=name, email=email)
+    session.add(new_user)
+    session.commit()
+
+    return new_user
+
+def get_user_id(email):
+    """Gets the user id of registered User based off of email.
+
+    Args:
+        email: The email of the user. This is assumed to be unique in the database.
+    Returns:
+        user_id if the user email exists in the User table, otherwise returns None.
+    """
+    try:
+        user = session.query(User).filter_by(email=email).one()
+        return user.id
+    except:
+        return None
 
 # JSON APIs to view Item Catalog Information
 @app.route('/api/v01/catalog/JSON/')
@@ -247,12 +288,13 @@ def new_category():
     Returns:
         Either category_new.html or redirects to catelog.htlm via show_catelog().
     """
-    if 'username' not in login_session:
+    # Verify the user is logged in.
+    if 'user_id' not in login_session:
         flash('Please login in order to add categories')
         return redirect(url_for('show_catalog'))
 
     if request.method == 'POST':
-        new_category = Category(name=request.form['name'])
+        new_category = Category(name=request.form['name'], user_id=login_session['user_id'])
         session.add(new_category)
         flash('New Category {} Successfully Created'.format(new_category.name))
         session.commit()
@@ -273,11 +315,18 @@ def edit_category(category_id):
     Returns:
         Either category_edit.html or redirects to catelog.htlm via show_catelog().
     """
-    if 'username' not in login_session:
+    # Verify the user is logged in.
+    if 'user_id' not in login_session:
         flash('Please login in order to edit categories')
         return redirect(url_for('show_catalog'))
 
     edited_category = session.query(Category).filter_by(id=category_id).one()
+
+    # Verify that user is attempting to edit a category they created.
+    if login_session['user_id'] != edited_category.user_id:
+        flash('Sorry. You can only edit categories that you added.')
+        return redirect(url_for('show_catalog'))
+
     if request.method == 'POST':
         if 'btn_submit' in request.form:
             if request.form['name']:
@@ -308,11 +357,18 @@ def delete_category(category_id):
     Returns:
         Either category_delete.html or redirects to catelog.htlm via show_catelog().
     """
-    if 'username' not in login_session:
+    # Verify the user is logged in.
+    if 'user_id' not in login_session:
         flash('Please login in order to delete categories')
         return redirect(url_for('show_catalog'))
 
     category_to_delete = session.query(Category).filter_by(id=category_id).one()
+
+    # Verify that user is attempting to edit a category they created.
+    if login_session['user_id'] != category_to_delete.user_id:
+        flash('Sorry. You can only delete categories that you added.')
+        return redirect(url_for('show_catalog'))
+
     if request.method == 'POST':
         if 'btn_submit' in request.form:
             items_to_delete = session.query(Item).filter_by(category_id=category_to_delete.id)
@@ -356,8 +412,9 @@ def new_item():
     Returns:
         Either item_new.html or redirects to catelog.htlm via show_catelog().
     """
-    if 'username' not in login_session:
-        flash('Please login in order to add items')
+    # Verify the user is logged in.
+    if 'user_id' not in login_session:
+        flash('Please login in order to add a new item')
         return redirect(url_for('show_catalog'))
 
     if request.method == 'POST':
@@ -365,6 +422,7 @@ def new_item():
             name=request.form['name'],
             description=request.form['description'],
             category_id=request.form['category_id'],
+            user_id=login_session['user_id'],
         )
         session.add(new_item)
         flash('New Item {} Successfully Created'.format(new_item.name))
@@ -387,11 +445,18 @@ def edit_item(item_id):
     Returns:
         Either item_edit.html or redirects to catelog.htlm via show_catelog().
     """
-    if 'username' not in login_session:
+    # Verify the user is logged in.
+    if 'user_id' not in login_session:
         flash('Please login in order to edit items')
         return redirect(url_for('show_catalog'))
 
     edited_item = session.query(Item).filter_by(id=item_id).one()
+
+    # Verify that user is attempting to edit a category they created.
+    if login_session['user_id'] != edited_item.user_id:
+        flash('Sorry. You can only edit items that you added.')
+        return redirect(url_for('show_catalog'))
+
     if request.method == 'POST':
         if 'btn_submit' in request.form:
             if request.form['name']:
@@ -429,11 +494,18 @@ def delete_item(item_id):
     Returns:
         Either item_delete.html or redirects to catelog.htlm via show_catelog().
     """
-    if 'username' not in login_session:
+    # Verify the user is logged in.
+    if 'user_id' not in login_session:
         flash('Please login in order to delete items')
         return redirect(url_for('show_catalog'))
 
     item_to_delete = session.query(Item).filter_by(id=item_id).one()
+
+    # Verify that user is attempting to edit a category they created.
+    if login_session['user_id'] != item_to_delete.user_id:
+        flash('Sorry. You can only delete items that you added.')
+        return redirect(url_for('show_catalog'))
+
     if request.method == 'POST':
         if 'btn_submit' in request.form:
             session.delete(item_to_delete)

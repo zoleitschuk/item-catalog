@@ -12,6 +12,21 @@ from sqlalchemy import create_engine
 Base = declarative_base()
 
 
+class User(Base):
+    """User class for use with the sqlalchemy ORM.
+
+    Keeps track of registered users' email and name in the system.
+
+    Attributes:
+        id: An integer representing the database id of Item object.
+        name: A string containing the name of the registered user.
+        email: A string containing the email of the registered user.
+    """
+    __tablename__ = 'user'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(250), nullable=False)
+    email = Column(String(250), nullable=False)
+
 class Category(Base):
     """Category class for use with the sqlalchemy ORM.
 
@@ -23,10 +38,15 @@ class Category(Base):
     Attributes:
         id: An integer representing the database id of category object.
         name: A string representing the name assigned to the Category object.
+        user_id: An integer representing the foriegn key of the associated User object.
+        user: The User object associated to the Item object.
     """
     __tablename__ = 'category'
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
+
     @property
     def serialize(self):
         """Return Category data in easily serializeable format
@@ -37,6 +57,7 @@ class Category(Base):
         return {
             'id': self.id,
             'name': self.name,
+            'user_id': self.user_id,
         }
 
 class Item(Base):
@@ -52,6 +73,8 @@ class Item(Base):
         description: A string representing the description assigned to the Item object.
         category_id: An integer representing the foriegn key of the associated Category object.
         category: The Category object associated with the Item object.
+        user_id: An integer representing the foriegn key of the associated User object.
+        user: The User object associated to the Item object.
     """
     __tablename__ = 'item'
     id = Column(Integer, primary_key=True)
@@ -59,6 +82,9 @@ class Item(Base):
     description = Column(String(250), nullable=True)
     category_id = Column(Integer, ForeignKey('category.id'))
     category = relationship(Category)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
+
     @property
     def serialize(self):
         """Return Item data in easily serializeable format
@@ -72,10 +98,11 @@ class Item(Base):
             'description': self.description,
             'category_id': self.category_id,
             'category_name': self.category.name,
+            'user_id': self.user_id,
         }
 
 engine = create_engine('sqlite:///itemCatalog.db')
- 
+
 
 Base.metadata.create_all(engine)
-    
+
