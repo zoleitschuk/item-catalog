@@ -1,6 +1,6 @@
 # Item Catelog
 
-Item Catelog provides a list of items within a variety of categories as well as a user registration and authentication system. Registered users have the ability to post, edit, and delete their own categories and items.
+Item Catalog provides a list of items within a variety of categories as well as a user registration and authentication system. Registered users have the ability to post, edit, and delete their own categories and items.
 
 ## Getting Started
 
