@@ -79,4 +79,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgements
 
-This project was created as part of required course work for the [Udacity Full-Stack Nanodegree](https://www.udacity.com/course/full-stack-web-developer-nanodegree--nd004). I used the code in the [udacity/OAuth2.0 repo](https://github.com/udacity/OAuth2.0) to guide my work in completing this project.
+This project was created as part of the required course work for the [Udacity Full-Stack Nanodegree](https://www.udacity.com/course/full-stack-web-developer-nanodegree--nd004). I used the code in the [udacity/OAuth2.0 repo](https://github.com/udacity/OAuth2.0) to guide my work in completing this project.
